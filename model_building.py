@@ -36,7 +36,6 @@ numerical_transformer = SimpleImputer(strategy='mean')
 categorical_transformer = Pipeline(steps=[
     ('imputer', SimpleImputer(strategy='most_frequent')),
     ('onehot', OneHotEncoder(handle_unknown='ignore'))
-    #('labelenc', OrdinalEncoder(handle_unknown='ignore'))
     ])
 
 preprocessor = ColumnTransformer(
@@ -60,6 +59,7 @@ from sklearn.linear_model import Ridge
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
 
 # =============================================================================
 # #first with only default parameters to get an idea of each model's effectiveness
@@ -232,7 +232,7 @@ def ridge_tuning(x,y, cv=5):
     start_process_time = time.process_time()
     start_time = time.time()
     
-    rr_model = Lasso()
+    rr_model = Ridge()
     rr_pipeline = Pipeline(steps=[('preprocessor', preprocessor),
                               ('model', rr_model)
                               ])
@@ -257,13 +257,78 @@ def ridge_tuning(x,y, cv=5):
     print(time.time() - start_time, end = ' '), print('real seconds')
 
 #ridge_tuning(X_train, y_train)
-#best params:  {'model__alpha': 0.0001, 'model__normalize': 'True'}
-#best score: -0.231683
-#1.9375 cpu seconds
-#4.816668272018433 real seconds
+#best params:  {'model__alpha': 0.01, 'model__normalize': 'True'}
+#best score: -0.218592
+#0.625 cpu seconds
+#4.2825610637664795 real seconds
 
-# plot model RMeanSquaredError
-rmse = {"Model":["RF","LR","Lasso", "RR"],"RMSE":[0.190108,0.218543,0.231683,0.231683]}
-rmse = pd.DataFrame(rmse)
+# run against test set
 
-sns.catplot(x="Model", y="RMSE", linestyles=["-"], kind="point", data=rmse)
+rf = RandomForestRegressor(max_depth=12, max_features='auto', n_estimators=2500)
+rf_pipeline = Pipeline(steps=[('preprocessor', preprocessor),
+                              ('model', rf)
+                              ])
+# =============================================================================
+# rf_pipeline.fit(X_train, y_train)
+# rf_pred=rf_pipeline.predict(X_test)
+# print('MAE: %f'% mean_absolute_error(y_test, rf_pred))
+# print('RMSE: %f'% np.sqrt(mean_squared_error(y_test, rf_pred))) 
+# print('Rsquared: %f'% r2_score(y_test, rf_pred))
+# MAE: 0.310704
+# RMSE: 0.440862
+# Rsquared: 0.593286
+# =============================================================================
+
+lr = LinearRegression(fit_intercept=True, copy_X=True, normalize=False )
+lr_pipeline = Pipeline(steps=[('preprocessor', preprocessor),
+                              ('model', lr)
+                              ])
+# =============================================================================
+# lr_pipeline.fit(X_train, y_train)
+# lr_pred=lr_pipeline.predict(X_test)
+# print('MAE: %f'% mean_absolute_error(y_test, lr_pred))
+# print('RMSE: %f'% np.sqrt(mean_squared_error(y_test, lr_pred))) 
+# print('Rsquared: %f'% r2_score(y_test, lr_pred))
+# MAE: 0.337080
+# RMSE: 0.469086
+# Rsquared: 0.539544
+# =============================================================================
+
+
+las = Lasso(alpha=0.0001, normalize=True )
+las_pipeline = Pipeline(steps=[('preprocessor', preprocessor),
+                              ('model', las)
+                              ])
+# =============================================================================
+# las_pipeline.fit(X_train, y_train)
+# las_pred=las_pipeline.predict(X_test)
+# print('MAE: %f'% mean_absolute_error(y_test, las_pred))
+# print('RMSE: %f'% np.sqrt(mean_squared_error(y_test, las_pred))) 
+# print('Rsquared: %f'% r2_score(y_test, las_pred))
+# MAE: 0.351071
+# RMSE: 0.486555
+# Rsquared: 0.504611
+# =============================================================================
+
+
+rr = Ridge(alpha=0.001, normalize=True )
+rr_pipeline = Pipeline(steps=[('preprocessor', preprocessor),
+                              ('model', rr)
+                              ])
+# =============================================================================
+# rr_pipeline.fit(X_train, y_train)
+# rr_pred=rr_pipeline.predict(X_test)
+# print('MAE: %f'% mean_absolute_error(y_test, rr_pred))
+# print('RMSE: %f'% np.sqrt(mean_squared_error(y_test, rr_pred))) 
+# print('Rsquared: %f'% r2_score(y_test, rr_pred))
+# MAE: 0.337203
+# RMSE: 0.469254
+# Rsquared: 0.539214
+# =============================================================================
+
+
+# plot model Mean Absolute Error
+mae = {"Model":["RF","LR","Lasso", "RR"],"MAE":[0.310704,0.337080,0.351071,0.337203]}
+mae = pd.DataFrame(mae)
+
+sns.catplot(x="Model", y="MAE", linestyles=["-"], kind="point", data=mae)
