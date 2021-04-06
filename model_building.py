@@ -62,7 +62,7 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error
 
 # =============================================================================
-# #first with only default parameters
+# #first with only default parameters to get an idea of each model's effectiveness
 # #random forest
 # rf = RandomForestRegressor()
 # rf_pipeline = Pipeline(steps=[('preprocessor', preprocessor),
