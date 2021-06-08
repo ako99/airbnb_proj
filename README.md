@@ -59,6 +59,6 @@ With optimized hyperparameters, Random Forest outperformed the other models by a
 * **Random Forest**: MAE = 0.311
 * **Multiple Linear Regression**: MAE = 0.337
 * **Lasso Regression**: MAE = 0.351
-* **Random Forest**: MAE = 0.337
+* **Ridge Regression**: MAE = 0.337
 
 ![alt text](https://github.com/ako99/airbnb_proj/blob/master/Images/MAE%20plot.png)
